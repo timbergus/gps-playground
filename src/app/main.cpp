@@ -6,9 +6,7 @@ int main()
 {
   GPS gps;
 
-  std::cout << gps.get_sample() << std::endl;
+  gps.get_data_stream();
 
   return EXIT_SUCCESS;
-
-  return 0;
 }
