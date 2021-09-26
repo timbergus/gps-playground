@@ -23,9 +23,13 @@
 #include "gsa.h"
 #include "gll.h"
 
+#include "color.h"
+
 class GPS
 {
 private:
+  Color palette;
+
   RMC *rmc;
   GSV *gsv;
   GSA *gsa;
@@ -81,21 +85,21 @@ void GPS::parse_sample(std::string sample)
   {
     rmc = new RMC(core_data);
 
-    std::cout << "RMC Sample Data" << std::endl;
-    std::cout << "===============" << std::endl;
-    std::cout << "Time: " << rmc->get_time() << std::endl;
-    std::cout << "Date: " << rmc->get_date() << std::endl;
-    std::cout << "Latitude: " << rmc->get_latitude() << std::endl;
-    std::cout << "Longitude: " << rmc->get_longitude() << std::endl;
-    std::cout << "Speed: " << rmc->get_speed("MS") << "m/s" << std::endl;
+    std::cout << palette.set_color("RMC Sample Data", "cyan", "underline") << "\n"
+              << std::endl;
+    std::cout << palette.set_color("Time: ", "green") << rmc->get_time() << std::endl;
+    std::cout << palette.set_color("Date: ", "green") << rmc->get_date() << std::endl;
+    std::cout << palette.set_color("Latitude: ", "green") << rmc->get_latitude() << std::endl;
+    std::cout << palette.set_color("Longitude: ", "green") << rmc->get_longitude() << std::endl;
+    std::cout << palette.set_color("Speed: ", "green") << rmc->get_speed("MS") << palette.set_color(" m/s", "magenta") << std::endl;
   }
 
   if (type == "GPGSV" and gsv->is_valid(initial_split[0], initial_split[1]))
   {
     gsv = new GSV(core_data);
 
-    std::cout << "GSV Sample Data" << std::endl;
-    std::cout << "===============" << std::endl;
+    std::cout << palette.set_color("GSV Sample Data", "cyan", "underline") << "\n"
+              << std::endl;
     gsv->print_data();
   }
 
@@ -103,8 +107,8 @@ void GPS::parse_sample(std::string sample)
   {
     gsa = new GSA(core_data);
 
-    std::cout << "GSA Sample Data" << std::endl;
-    std::cout << "===============" << std::endl;
+    std::cout << palette.set_color("GSA Sample Data", "cyan", "underline") << "\n"
+              << std::endl;
     gsa->print_data();
   }
 
@@ -112,11 +116,11 @@ void GPS::parse_sample(std::string sample)
   {
     gll = new GLL(core_data);
 
-    std::cout << "GLL Sample Data" << std::endl;
-    std::cout << "===============" << std::endl;
-    std::cout << "Time: " << gll->get_time() << std::endl;
-    std::cout << "Latitude: " << gll->get_latitude() << std::endl;
-    std::cout << "Longitude: " << gll->get_longitude() << std::endl;
+    std::cout << palette.set_color("GLL Sample Data", "cyan", "underline") << "\n"
+              << std::endl;
+    std::cout << palette.set_color("Time: ", "green") << gll->get_time() << std::endl;
+    std::cout << palette.set_color("Latitude: ", "green") << gll->get_latitude() << std::endl;
+    std::cout << palette.set_color("Longitude: ", "green") << gll->get_longitude() << std::endl;
   }
 }
 

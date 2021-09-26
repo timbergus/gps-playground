@@ -8,10 +8,13 @@
 #include <vector>
 
 #include "utils.h"
+#include "color.h"
 
 class GSV
 {
 private:
+  Color palette;
+
   struct satellite_t
   {
     std::string id;
@@ -85,21 +88,21 @@ bool GSV::is_valid(std::string core_data, std::string checksum)
 
 void GSV::print_data()
 {
-  std::cout << "Type: " << data.type << std::endl;
-  std::cout << "Number of Satellites: " << data.number_of_satellites << std::endl;
-  std::cout << "Sequence Number: " << data.sequence_number << std::endl;
-  std::cout << "Satellites in View: " << data.satellites_in_view << "\n"
+  std::cout << palette.set_color("Type: ", "green") << data.type << std::endl;
+  std::cout << palette.set_color("Number of Satellites: ", "green") << data.number_of_satellites << std::endl;
+  std::cout << palette.set_color("Sequence Number: ", "green") << data.sequence_number << std::endl;
+  std::cout << palette.set_color("Satellites in View: ", "green") << data.satellites_in_view << "\n"
             << std::endl;
 
-  std::cout << "Satellites" << std::endl;
-  std::cout << "==========" << std::endl;
+  std::cout << palette.set_color("Satellites", "yellow", "underline") << "\n"
+            << std::endl;
 
   for (int i = 0; i < std::stoi(data.number_of_satellites); i++)
   {
-    std::cout << "Id: " << data.satellites[i].id << " | ";
-    std::cout << "Elevation: " << data.satellites[i].elevation << " | ";
-    std::cout << "Azimuth: " << data.satellites[i].azimuth << " | ";
-    std::cout << "SNR: " << data.satellites[i].snr << std::endl;
+    std::cout << palette.set_color("Id: ", "green") << data.satellites[i].id << palette.set_color(" | ", "red");
+    std::cout << palette.set_color("Elevation: ", "green") << data.satellites[i].elevation << palette.set_color(" | ", "red");
+    std::cout << palette.set_color("Azimuth: ", "green") << data.satellites[i].azimuth << palette.set_color(" | ", "red");
+    std::cout << palette.set_color("SNR: ", "green") << data.satellites[i].snr << std::endl;
   }
 }
 

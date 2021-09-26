@@ -7,9 +7,13 @@
 #include <string>
 #include <vector>
 
+#include "color.h"
+
 class GLL
 {
 private:
+  Color palette;
+
   struct gll_t
   {
     std::string type;
@@ -93,14 +97,14 @@ double GLL::get_longitude()
 
 void GLL::print_data()
 {
-  std::cout << "Type: " << data.type << std::endl;
-  std::cout << "UTC Time: " << data.utc_time << std::endl;
-  std::cout << "Status: " << data.status << std::endl;
-  std::cout << "Latitude: " << data.latitude << std::endl;
-  std::cout << "Latitude Direction: " << data.latitude_direction << std::endl;
-  std::cout << "Longitude: " << data.longitude << std::endl;
-  std::cout << "Longitude Direction: " << data.longitude_direction << std::endl;
-  std::cout << "Mode: " << data.mode << std::endl;
+  std::cout << palette.set_color("Type: ", "green") << data.type << std::endl;
+  std::cout << palette.set_color("UTC Time: ", "green") << data.utc_time << std::endl;
+  std::cout << palette.set_color("Status: ", "green") << data.status << std::endl;
+  std::cout << palette.set_color("Latitude: ", "green") << data.latitude << std::endl;
+  std::cout << palette.set_color("Latitude Direction: ", "green") << data.latitude_direction << std::endl;
+  std::cout << palette.set_color("Longitude: ", "green") << data.longitude << std::endl;
+  std::cout << palette.set_color("Longitude Direction: ", "green") << data.longitude_direction << std::endl;
+  std::cout << palette.set_color("Mode: ", "green") << data.mode << std::endl;
 }
 
 #endif /* GLL_H */

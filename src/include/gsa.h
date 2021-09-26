@@ -8,10 +8,13 @@
 #include <vector>
 
 #include "utils.h"
+#include "color.h"
 
 class GSA
 {
 private:
+  Color palette;
+
   struct gsa_t
   {
     std::string type;
@@ -72,12 +75,12 @@ bool GSA::is_valid(std::string core_data, std::string checksum)
 
 void GSA::print_data()
 {
-  std::cout << "Mode: " << data.mode << std::endl;
-  std::cout << "Fix Type: " << data.fix_type << std::endl;
-  std::cout << "Satellite: " << Utils::stringify_vector(data.satellites) << std::endl;
-  std::cout << "PDOP: " << data.PDOP << std::endl;
-  std::cout << "HDOP: " << data.HDOP << std::endl;
-  std::cout << "VDOP: " << data.VDOP << std::endl;
+  std::cout << palette.set_color("Mode: ", "green") << data.mode << std::endl;
+  std::cout << palette.set_color("Fix Type: ", "green") << data.fix_type << std::endl;
+  std::cout << palette.set_color("Satellite: ", "green") << Utils::stringify_vector(data.satellites) << std::endl;
+  std::cout << palette.set_color("PDOP: ", "green") << data.PDOP << std::endl;
+  std::cout << palette.set_color("HDOP: ", "green") << data.HDOP << std::endl;
+  std::cout << palette.set_color("VDOP: ", "green") << data.VDOP << std::endl;
 }
 
 #endif /* GSA_H */
