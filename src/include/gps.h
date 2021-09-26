@@ -37,7 +37,7 @@ public:
   GPS();
   ~GPS();
 
-  void get_data_stream(std::string);
+  void get_data_stream(std::string, std::function<void(std::string)> callback);
   void parse_sample(std::string);
 };
 
@@ -49,9 +49,9 @@ GPS::~GPS()
 {
 }
 
-void GPS::read_data_stream(std::string filename, std::function<void(std::string)> callback)
+void GPS::read_data_stream(std::string file_name, std::function<void(std::string)> callback)
 {
-  std::ifstream file(filename);
+  std::ifstream file(file_name);
   char buffer[1024];
   while (!file.eof())
   {
@@ -120,10 +120,9 @@ void GPS::parse_sample(std::string sample)
   }
 }
 
-void GPS::get_data_stream(std::string filename)
+void GPS::get_data_stream(std::string file_name, std::function<void(std::string)> callback)
 {
-  read_data_stream(filename, [this](std::string sample)
-                   { this->parse_sample(sample); });
+  read_data_stream(file_name, callback);
 }
 
 #endif /* GPS_H */
