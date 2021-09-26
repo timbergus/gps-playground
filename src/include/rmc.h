@@ -3,7 +3,9 @@
 #ifndef RMC_H
 #define RMC_H
 
+#include <iostream>
 #include <string>
+#include <vector>
 
 // TODO: Fix the library to use it. I have asked here.
 // https://stackoverflow.com/questions/56608684/how-to-use-the-fmt-library-without-getting-undefined-symbols-for-architecture-x
@@ -160,7 +162,6 @@ void RMC::print_data()
   std::cout << "Course: " << data.course << std::endl;
   std::cout << "UTC Date: " << data.utc_date << std::endl;
   std::cout << "Mode: " << data.mode << std::endl;
-  std::cout << "Checksum: " << data.checksum << std::endl;
 }
 
 #endif /* RMC_H */

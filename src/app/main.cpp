@@ -6,7 +6,7 @@ int main()
 {
   GPS gps;
 
-  gps.get_data_stream();
+  gps.get_data_stream("./src/data/samples.txt");
 
   return EXIT_SUCCESS;
 }
