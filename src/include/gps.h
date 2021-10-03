@@ -16,6 +16,8 @@
 // Sleep.
 #include <chrono>
 #include <thread>
+// Maths
+#include <cmath>
 
 #include "utils.h"
 #include "rmc.h"
@@ -61,7 +63,11 @@ void GPS::read_data_stream(std::string file_name, std::function<void(std::string
   {
     file.getline(buffer, sizeof buffer);
     callback(buffer);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+    int samples = 20000;
+    double time = 1666.71;
+
+    std::this_thread::sleep_for(std::chrono::milliseconds((int)std::ceil(time * 1000 / samples)));
   }
 }
 
