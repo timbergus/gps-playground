@@ -12,11 +12,11 @@ OBJS=$(BIN)/main.o
 
 $(BIN)/%.o: $(INCLUDE)/%.cpp
 	@mkdir -p $(BIN)
-	$(CC) $(CFLAGS) $(IFLAGS) $(LFLAGS) -c -MD $< -o $@
+	$(CC) $(CFLAGS) $(IFLAGS) -c -MD $< -o $@
 
 $(BIN)/%.o: $(ROOT)/%.cpp
 	@mkdir -p $(BIN)
-	$(CC) $(CFLAGS) $(IFLAGS) $(LFLAGS) -c -MD $< -o $@
+	$(CC) $(CFLAGS) $(IFLAGS) -c -MD $< -o $@
 
 $(TARGET): $(OBJS)
 	@$(CC) $(CFLAGS) $(IFLAGS) $(LFLAGS) $(OBJS) -o $(BIN)/$(TARGET)
