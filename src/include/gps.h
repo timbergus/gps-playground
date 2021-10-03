@@ -10,7 +10,7 @@
 #include <string>
 #include <cstring>
 #include <fstream>
-#include <ranges>
+// #include <ranges>
 #include <vector>
 #include <functional>
 // Sleep.
