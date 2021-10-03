@@ -23,6 +23,3 @@ bin
 
 # vscode settings
 .vscode
-
-# data
-src/data
