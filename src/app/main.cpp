@@ -4,8 +4,6 @@
 
 int main()
 {
-  std::cout << "Hello World!" << std::endl;
-
   GPS gps;
 
   gps.get_data_stream("./src/data/samples.txt", [&gps](std::string sample)
