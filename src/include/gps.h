@@ -85,7 +85,11 @@ void GPS::parse_sample(std::string sample)
 
   core_data.push_back(initial_split[1]);
 
+#ifdef _WIN32
+  std::system("cls");
+#else
   std::system("clear");
+#endif
 
   if (type == "GNRMC" && rmc->is_valid(initial_split[0], initial_split[1]))
   {
