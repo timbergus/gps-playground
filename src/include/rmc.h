@@ -96,7 +96,7 @@ bool RMC::is_valid(std::string core_data, std::string checksum)
 
   char hex_check[20];
 
-  sprintf_s(hex_check, "%X", check);
+  sprintf(hex_check, "%X", check);
 
   return hex_check == checksum;
 }

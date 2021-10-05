@@ -32,13 +32,12 @@ std::vector<std::string> Utils::clean_split(std::string sample, std::string deli
 {
   std::vector<std::string> result;
 
-  char *next_token;
-  char *token = strtok_s(&sample[0], delimeter.c_str(), &next_token);
+  char *token = strtok(&sample[0], delimeter.c_str());
 
   while (token)
   {
     result.push_back(token);
-    token = strtok_s(NULL, delimeter.c_str(), &next_token);
+    token = strtok(NULL, delimeter.c_str());
   }
 
   return result;
