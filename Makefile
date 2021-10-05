@@ -4,7 +4,7 @@ TARGET=gps-playground
 
 ROOT=src
 APP=$(ROOT)/app
-INCLUDE=${ROOT}/include
+INCLUDE=$(ROOT)/include
 BIN=bin
 
 ifeq ($(OS),Windows_NT)
