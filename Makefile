@@ -1,21 +1,20 @@
+CXX=clang++
+
 TARGET=gps-playground
 
 ROOT=src
-APP=${ROOT}/app
+APP=$(ROOT)/app
 INCLUDE=${ROOT}/include
+BIN=bin
 
-ifeq ($(OS),Windows_NT) # is Windows_NT on XP, 2000, 7, Vista, 10...
-    CC=clang++
+ifeq ($(OS),Windows_NT)
 	IFLAGS=-I $(INCLUDE)
-	BIN=src\bin
 else
-    CC=g++-11
 	IFLAGS=-I $(INCLUDE) -I /usr/local/include
 	LFLAGS=-L /usr/local/lib -lfmt
-	BIN=${ROOT}/bin
 endif
 
-CFLAGS=-std=c++20 -Werror -Wall -Wextra
+CFLAGS=-std=c++2a -Werror -Wall -Wextra
 
 OBJS=$(BIN)/main.o
 
@@ -25,7 +24,7 @@ ifeq ($(OS),Windows_NT)
 else
 	@mkdir -p $(BIN)
 endif
-	$(CC) $(CFLAGS) $(IFLAGS) -c -MD $< -o $@
+	$(CXX) $(CFLAGS) $(IFLAGS) -c -MD $< -o $@
 
 $(BIN)/%.o: $(APP)/%.cpp
 ifeq ($(OS),Windows_NT)
@@ -33,10 +32,10 @@ ifeq ($(OS),Windows_NT)
 else
 	@mkdir -p $(BIN)
 endif
-	$(CC) $(CFLAGS) $(IFLAGS) -c -MD $< -o $@
+	$(CXX) $(CFLAGS) $(IFLAGS) -c -MD $< -o $@
 
 $(TARGET): $(OBJS)
-	@$(CC) $(CFLAGS) $(IFLAGS) $(LFLAGS) $(OBJS) -o $(BIN)/$(TARGET)
+	@$(CXX) $(CFLAGS) $(IFLAGS) $(LFLAGS) $(OBJS) -o $(BIN)/$(TARGET)
 
 -include $(BIN)/*.d
 
