@@ -11,7 +11,7 @@ ifeq ($(OS),Windows_NT)
 	IFLAGS=-I $(INCLUDE)
 else
 	IFLAGS=-I $(INCLUDE) -I /usr/local/include
-	LFLAGS=-L /usr/local/lib -lfmt
+#   LFLAGS=-L /usr/local/lib -lfmt
 endif
 
 CFLAGS=-std=c++2a -Werror -Wall -Wextra
