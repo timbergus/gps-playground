@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "gps.h"
+#include "../include/gps.h"
 
 int main()
 {
@@ -11,8 +11,7 @@ int main()
                         if (sample.substr(1, 5) == "GNRMC")
                         {
                           gps.parse_sample(sample);
-                        }
-                      });
+                        } });
 
   return EXIT_SUCCESS;
 }
