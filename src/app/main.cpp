@@ -1,17 +1,20 @@
-#include <iostream>
-
 #include "../include/gps.h"
+
+#define SAMPLE_TYPE "GNRMC"
 
 int main()
 {
   GPS gps;
 
-  gps.get_data_stream("./src/data/samples.txt", [&gps](std::string sample)
-                      {
-                        if (sample.substr(1, 5) == "GNRMC")
-                        {
-                          gps.parse_sample(sample);
-                        } });
+  const auto gpsCallback = [&gps](std::string sample)
+  {
+    if (Utils::get_type(sample) == SAMPLE_TYPE)
+    {
+      gps.parse_sample(sample);
+    }
+  };
+
+  gps.get_data_stream("./src/data/samples.txt", gpsCallback);
 
   return EXIT_SUCCESS;
 }

@@ -8,11 +8,14 @@
 #include <vector>
 
 #include "color.h"
+#include "print.h"
+#include "utils.h"
 
 class GLL
 {
 private:
   Color palette;
+  Print printer;
 
   struct gll_t
   {
@@ -38,7 +41,8 @@ public:
   double get_latitude();
   double get_longitude();
 
-  void print_data();
+  void print_raw_data();
+  void print_formatted_data();
 };
 
 GLL::GLL(std::vector<std::string> core_data)
@@ -95,16 +99,25 @@ double GLL::get_longitude()
   return sign * std::stod(data.longitude) / 100.0;
 }
 
-void GLL::print_data()
+void GLL::print_raw_data()
 {
-  std::cout << palette.set_color("Type: ", "green") << data.type << std::endl;
-  std::cout << palette.set_color("UTC Time: ", "green") << data.utc_time << std::endl;
-  std::cout << palette.set_color("Status: ", "green") << data.status << std::endl;
-  std::cout << palette.set_color("Latitude: ", "green") << data.latitude << std::endl;
-  std::cout << palette.set_color("Latitude Direction: ", "green") << data.latitude_direction << std::endl;
-  std::cout << palette.set_color("Longitude: ", "green") << data.longitude << std::endl;
-  std::cout << palette.set_color("Longitude Direction: ", "green") << data.longitude_direction << std::endl;
-  std::cout << palette.set_color("Mode: ", "green") << data.mode << std::endl;
+  printer.print_title("GLL Sample Data");
+  printer.print_info("Type", data.type);
+  printer.print_info("UTC Time", data.utc_time);
+  printer.print_info("Status", data.status);
+  printer.print_info("Latitude", data.latitude);
+  printer.print_info("Latitude Direction", data.latitude_direction);
+  printer.print_info("Longitude", data.longitude);
+  printer.print_info("Longitude Direction", data.longitude_direction);
+  printer.print_info("Mode", data.mode);
+}
+
+void GLL::print_formatted_data()
+{
+  printer.print_title("GLL Sample Data");
+  printer.print_info("Time", Utils::get_time(data.utc_time));
+  printer.print_number("Latitude", Utils::get_latitude(data.latitude));
+  printer.print_number("Longitude", Utils::get_longitude(data.longitude, data.longitude_direction));
 }
 
 #endif /* GLL_H */

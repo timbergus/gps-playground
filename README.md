@@ -29,3 +29,7 @@ make clean
 ## Data
 
 It uses randomly generated data stored in `src/data/samples.txt`. It's a file with a measure per line.
+
+## Libraries
+
+To use [`format`](https://github.com/fmtlib/fmt), you need to install it with `brew` (maybe cloning it on Windows, or using something like [Conan](https://conan.io/)).

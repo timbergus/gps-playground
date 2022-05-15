@@ -7,13 +7,14 @@
 #include <string>
 #include <vector>
 
-#include "utils.h"
 #include "color.h"
+#include "print.h"
 
 class GSV
 {
 private:
   Color palette;
+  Print printer;
 
   struct satellite_t
   {
@@ -39,6 +40,7 @@ public:
 
   bool is_valid(std::string, std::string);
 
+  void print_satellite(satellite_t satellite);
   void print_data();
 };
 
@@ -86,23 +88,40 @@ bool GSV::is_valid(std::string core_data, std::string checksum)
   return hex_check == checksum;
 }
 
+void GSV::print_satellite(satellite_t satellite)
+{
+  std::string separator = palette.set_color(" | ", "red");
+
+  std::string idLabel = palette.set_color("Id: ", "green");
+  std::string elevationLabel = palette.set_color("Elevation: ", "green");
+  std::string azimuthLabel = palette.set_color("Azimuth: ", "green");
+  std::string snrLabel = palette.set_color("SNR: ", "green");
+
+  std::cout << fmt::format("{1} {2} {0} {3} {4} {0} {5} {6} {0} {7} {8}\n",
+                           separator,
+                           idLabel,
+                           satellite.id,
+                           elevationLabel,
+                           satellite.elevation,
+                           azimuthLabel,
+                           satellite.azimuth,
+                           snrLabel,
+                           satellite.snr);
+}
+
 void GSV::print_data()
 {
-  std::cout << palette.set_color("Type: ", "green") << data.type << std::endl;
-  std::cout << palette.set_color("Number of Satellites: ", "green") << data.number_of_satellites << std::endl;
-  std::cout << palette.set_color("Sequence Number: ", "green") << data.sequence_number << std::endl;
-  std::cout << palette.set_color("Satellites in View: ", "green") << data.satellites_in_view << "\n"
-            << std::endl;
+  printer.print_title("GSV Sample Data");
+  printer.print_info("Type", data.type);
+  printer.print_info("Number of Satellites", data.number_of_satellites);
+  printer.print_info("Sequence Number", data.sequence_number);
+  printer.print_info("Satellites in View", data.satellites_in_view);
 
-  std::cout << palette.set_color("Satellites", "yellow", "underline") << "\n"
-            << std::endl;
+  printer.print_subtitle("Satellites");
 
   for (int i = 0; i < std::stoi(data.number_of_satellites); i++)
   {
-    std::cout << palette.set_color("Id: ", "green") << data.satellites[i].id << palette.set_color(" | ", "red");
-    std::cout << palette.set_color("Elevation: ", "green") << data.satellites[i].elevation << palette.set_color(" | ", "red");
-    std::cout << palette.set_color("Azimuth: ", "green") << data.satellites[i].azimuth << palette.set_color(" | ", "red");
-    std::cout << palette.set_color("SNR: ", "green") << data.satellites[i].snr << std::endl;
+    print_satellite(data.satellites[i]);
   }
 }
 

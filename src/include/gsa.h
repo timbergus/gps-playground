@@ -7,13 +7,15 @@
 #include <string>
 #include <vector>
 
-#include "utils.h"
 #include "color.h"
+#include "print.h"
+#include "utils.h"
 
 class GSA
 {
 private:
   Color palette;
+  Print printer;
 
   struct gsa_t
   {
@@ -75,12 +77,13 @@ bool GSA::is_valid(std::string core_data, std::string checksum)
 
 void GSA::print_data()
 {
-  std::cout << palette.set_color("Mode: ", "green") << data.mode << std::endl;
-  std::cout << palette.set_color("Fix Type: ", "green") << data.fix_type << std::endl;
-  std::cout << palette.set_color("Satellite: ", "green") << Utils::stringify_vector(data.satellites) << std::endl;
-  std::cout << palette.set_color("PDOP: ", "green") << data.PDOP << std::endl;
-  std::cout << palette.set_color("HDOP: ", "green") << data.HDOP << std::endl;
-  std::cout << palette.set_color("VDOP: ", "green") << data.VDOP << std::endl;
+  printer.print_title("GSA Sample Data");
+  printer.print_info("Mode", data.mode);
+  printer.print_info("Fix Type", data.fix_type);
+  printer.print_info("Satellite", Utils::stringify_vector(data.satellites));
+  printer.print_info("PDOP", data.PDOP);
+  printer.print_info("HDOP", data.HDOP);
+  printer.print_info("VDOP", data.VDOP);
 }
 
 #endif /* GSA_H */

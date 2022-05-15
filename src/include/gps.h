@@ -19,6 +19,9 @@
 // Maths
 #include <cmath>
 
+#define FMT_HEADER_ONLY
+#include <fmt/format.h>
+
 #include "utils.h"
 #include "rmc.h"
 #include "gsv.h"
@@ -57,16 +60,17 @@ GPS::~GPS()
 
 void GPS::read_data_stream(std::string file_name, std::function<void(std::string)> callback)
 {
-  std::ifstream file(file_name);
-  char buffer[1024];
-  while (!file.eof())
+  int samples = 20000;
+  double time = 1666.71;
+
+  std::fstream measures;
+  std::string measure;
+
+  measures.open(file_name, std::ios::in);
+
+  while (std::getline(measures, measure))
   {
-    file.getline(buffer, sizeof buffer);
-    callback(buffer);
-
-    int samples = 20000;
-    double time = 1666.71;
-
+    callback(measure);
     std::this_thread::sleep_for(std::chrono::milliseconds((int)std::ceil(time * 1000 / samples)));
   }
 }
@@ -94,43 +98,25 @@ void GPS::parse_sample(std::string sample)
   if (type == "GNRMC" && rmc->is_valid(initial_split[0], initial_split[1]))
   {
     rmc = new RMC(core_data);
-
-    std::cout << palette.set_color("RMC Sample Data", "cyan", "underline") << "\n"
-              << std::endl;
-    std::cout << palette.set_color("Time: ", "green") << rmc->get_time() << std::endl;
-    std::cout << palette.set_color("Date: ", "green") << rmc->get_date() << std::endl;
-    std::cout << palette.set_color("Latitude: ", "green") << rmc->get_latitude() << std::endl;
-    std::cout << palette.set_color("Longitude: ", "green") << rmc->get_longitude() << std::endl;
-    std::cout << palette.set_color("Speed: ", "green") << rmc->get_speed("MS") << palette.set_color(" m/s", "magenta") << std::endl;
+    rmc->print_formatted_data();
   }
 
   if (type == "GPGSV" and gsv->is_valid(initial_split[0], initial_split[1]))
   {
     gsv = new GSV(core_data);
-
-    std::cout << palette.set_color("GSV Sample Data", "cyan", "underline") << "\n"
-              << std::endl;
     gsv->print_data();
   }
 
   if (type == "GNGSA" && gsa->is_valid(initial_split[0], initial_split[1]))
   {
     gsa = new GSA(core_data);
-
-    std::cout << palette.set_color("GSA Sample Data", "cyan", "underline") << "\n"
-              << std::endl;
     gsa->print_data();
   }
 
   if (type == "GNGLL" && gll->is_valid(initial_split[0], initial_split[1]))
   {
     gll = new GLL(core_data);
-
-    std::cout << palette.set_color("GLL Sample Data", "cyan", "underline") << "\n"
-              << std::endl;
-    std::cout << palette.set_color("Time: ", "green") << gll->get_time() << std::endl;
-    std::cout << palette.set_color("Latitude: ", "green") << gll->get_latitude() << std::endl;
-    std::cout << palette.set_color("Longitude: ", "green") << gll->get_longitude() << std::endl;
+    gll->print_formatted_data();
   }
 }
 

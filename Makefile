@@ -1,4 +1,5 @@
 CXX=clang++
+C_VERSION=c++20
 
 TARGET=gps-playground
 
@@ -8,13 +9,18 @@ INCLUDE=$(ROOT)/include
 BIN=bin
 
 ifeq ($(OS),Windows_NT)
-	IFLAGS=-I $(INCLUDE)
+FMT_INCLUDE=???
 else
-	IFLAGS=-I $(INCLUDE) -I /usr/local/include
-#   LFLAGS=-L /usr/local/lib -lfmt
+FMT_INCLUDE=/opt/homebrew/Cellar/fmt/8.1.1_1/include
 endif
 
-CFLAGS=-std=c++2a -Werror -Wall -Wextra
+ifeq ($(OS),Windows_NT)
+IFLAGS=-I $(INCLUDE)
+else
+IFLAGS=-I $(INCLUDE) -I $(FMT_INCLUDE)
+endif
+
+CFLAGS=-std=$(C_VERSION) -Werror -Wall -Wextra
 
 OBJS=$(BIN)/main.o
 

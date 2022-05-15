@@ -7,6 +7,9 @@
 #include <vector>
 #include <map>
 
+#define KNTOMS 0.514444444
+#define KNTOKMH 1.85
+
 class Utils
 {
 private:
@@ -18,6 +21,13 @@ public:
   static std::vector<std::string> clean_split(std::string, std::string);
   static std::string stringify_vector(std::vector<std::string>);
   static std::string stringify_map(std::map<std::string, std::string>);
+
+  static std::string get_type(std::string);
+  static std::string get_time(std::string);
+  static std::string get_date(std::string, std::string = "sp");
+  static double get_latitude(std::string);
+  static double get_longitude(std::string, std::string);
+  static double get_speed(std::string, std::string = "ms");
 };
 
 Utils::Utils()
@@ -107,6 +117,63 @@ std::string Utils::stringify_map(std::map<std::string, std::string> tokens)
   result += " }";
 
   return result;
+}
+
+std::string Utils::get_type(std::string sample)
+{
+  return sample.substr(1, 5);
+}
+
+std::string Utils::get_time(std::string utc_time)
+{
+  std::string hours = utc_time.substr(0, 2);
+  std::string minutes = utc_time.substr(2, 2);
+  std::string seconds = utc_time.substr(4, 2);
+
+  return hours + ":" + minutes + ":" + seconds;
+}
+
+std::string Utils::get_date(std::string utc_date, std::string language)
+{
+  std::string day = utc_date.substr(0, 2);
+  std::string month = utc_date.substr(2, 2);
+  std::string year = utc_date.substr(4, 2);
+
+  if (language == "en")
+  {
+    return month + "/" + day + "/" + year;
+  }
+  else
+  {
+    return day + "/" + month + "/" + year;
+  }
+}
+
+double Utils::get_latitude(std::string latitude)
+{
+  return std::stod(latitude) / 100.0;
+}
+
+double Utils::get_longitude(std::string longitude, std::string longitude_direction)
+{
+  double sign = longitude_direction == "W" ? -1.0 : 1.0;
+  return sign * std::stod(longitude) / 100.0;
+}
+
+double Utils::get_speed(std::string speed, std::string units)
+{
+  double parsedSpeed = 0.0;
+
+  if (units == "ms")
+  {
+    parsedSpeed = std::stod(speed) * KNTOMS;
+  }
+  else if (units == "kmh")
+  {
+    parsedSpeed = std::stod(speed) * KNTOKMH;
+  }
+
+  return parsedSpeed;
 }
 
 #endif // UTILS_H

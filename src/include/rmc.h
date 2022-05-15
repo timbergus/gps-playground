@@ -7,27 +7,18 @@
 #include <string>
 #include <vector>
 
+#define FMT_HEADER_ONLY
+#include <fmt/format.h>
+
 #include "color.h"
-
-// TODO: Fix the library to use it. I have asked here.
-// https://stackoverflow.com/questions/56608684/how-to-use-the-fmt-library-without-getting-undefined-symbols-for-architecture-x
-
-/**
- * FMT: https://github.com/fmtlib/fmt.
- *
- * To install it use brew.
- * https://fmt.dev/latest/usage.html#homebrew
- */
-
-// #include <fmt/format.h>
-
-#define KNTOMS 0.514444444
-#define KNTOKMH 1.85
+#include "print.h"
+#include "utils.h"
 
 class RMC
 {
 private:
   Color palette;
+  Print printer;
 
   struct rmc_t
   {
@@ -51,14 +42,8 @@ public:
 
   bool is_valid(std::string, std::string);
 
-  std::string get_time();
-  std::string get_date(std::string);
-
-  double get_latitude();
-  double get_longitude();
-  double get_speed(std::string);
-
-  void print_data();
+  void print_raw_data();
+  void print_formatted_data();
 };
 
 RMC::RMC(std::vector<std::string> core_data)
@@ -101,71 +86,30 @@ bool RMC::is_valid(std::string core_data, std::string checksum)
   return hex_check == checksum;
 }
 
-std::string RMC::get_time()
+void RMC::print_raw_data()
 {
-  std::string hours = data.utc_time.substr(0, 2);
-  std::string minutes = data.utc_time.substr(2, 2);
-  std::string seconds = data.utc_time.substr(4, 2);
-
-  return hours + ":" + minutes + ":" + seconds;
+  printer.print_title("RMC Sample Data");
+  printer.print_info("Type", data.type);
+  printer.print_info("UTC Time", data.utc_time);
+  printer.print_info("Status", data.status);
+  printer.print_info("Latitude", data.latitude);
+  printer.print_info("Latitude Direction", data.latitude_direction);
+  printer.print_info("Longitude", data.longitude);
+  printer.print_info("Longitude Direction", data.longitude_direction);
+  printer.print_info("Speed", data.speed);
+  printer.print_info("Course", data.course);
+  printer.print_info("UTC Date", data.utc_date);
+  printer.print_info("Mode", data.mode);
 }
 
-std::string RMC::get_date(std::string language = "sp")
+void RMC::print_formatted_data()
 {
-  std::string day = data.utc_date.substr(0, 2);
-  std::string month = data.utc_date.substr(2, 2);
-  std::string year = data.utc_date.substr(4, 2);
-
-  if (language == "en")
-  {
-    return month + "/" + day + "/" + year;
-  }
-  else
-  {
-    return day + "/" + month + "/" + year;
-  }
-}
-
-double RMC::get_latitude()
-{
-  return std::stod(data.latitude) / 100.0;
-}
-
-double RMC::get_longitude()
-{
-  double sign = data.longitude_direction == "W" ? -1.0 : 1.0;
-  return sign * std::stod(data.longitude) / 100.0;
-}
-
-double RMC::get_speed(std::string units)
-{
-  double speed = 0.0;
-
-  if (units == "MS")
-  {
-    speed = std::stod(data.speed) * KNTOMS;
-  }
-  else if (units == "KMH")
-  {
-    speed = std::stod(data.speed) * KNTOKMH;
-  }
-
-  return speed;
-}
-
-void RMC::print_data()
-{
-  std::cout << palette.set_color("Type: ", "green") << data.type << std::endl;
-  std::cout << palette.set_color("UTC Time: ", "green") << data.utc_time << std::endl;
-  std::cout << palette.set_color("Status: ", "green") << data.status << std::endl;
-  std::cout << palette.set_color("Latitude: ", "green") << data.latitude << std::endl;
-  std::cout << palette.set_color("Latitude Direction: ", "green") << data.latitude_direction << std::endl;
-  std::cout << palette.set_color("Longitude: ", "green") << data.longitude << std::endl;
-  std::cout << palette.set_color("Longitude Direction: ", "green") << data.longitude_direction << std::endl;
-  std::cout << palette.set_color("Speed: ", "green") << data.speed << std::endl;
-  std::cout << palette.set_color("Course: ", "green") << data.course << std::endl;
-  std::cout << palette.set_color("UTC Date: ", "green") << data.utc_date << std::endl;
-  std::cout << palette.set_color("Mode: ", "green") << data.mode << std::endl;
+  printer.print_title("RMC Sample Data");
+  printer.print_info("Time", Utils::get_time(data.utc_time));
+  printer.print_info("Date", Utils::get_date(data.utc_date));
+  printer.print_number("Latitude", Utils::get_latitude(data.latitude));
+  printer.print_number("Longitude", Utils::get_longitude(data.longitude, data.longitude_direction));
+  printer.print_number("Speed", Utils::get_speed(data.speed, "ms"), "m/s");
 }
 
 #endif /* RMC_H */
