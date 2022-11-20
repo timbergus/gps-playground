@@ -38,8 +38,6 @@ public:
   GSV(std::vector<std::string>);
   ~GSV();
 
-  bool is_valid(std::string, std::string);
-
   void print_satellite(satellite_t satellite);
   void print_data();
 };
@@ -68,24 +66,6 @@ GSV::GSV(std::vector<std::string> core_data)
 
 GSV::~GSV()
 {
-}
-
-bool GSV::is_valid(std::string core_data, std::string checksum)
-{
-  std::string data = core_data.substr(1);
-
-  int check = 0;
-
-  for (int i = 0; i < (int)data.size(); i++)
-  {
-    check = char(check ^ data.at(i));
-  }
-
-  char hex_check[20];
-
-  sprintf(hex_check, "%X", check);
-
-  return hex_check == checksum;
 }
 
 void GSV::print_satellite(satellite_t satellite)

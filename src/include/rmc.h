@@ -7,9 +7,6 @@
 #include <string>
 #include <vector>
 
-#define FMT_HEADER_ONLY
-#include <fmt/format.h>
-
 #include "color.h"
 #include "print.h"
 #include "utils.h"
@@ -40,8 +37,6 @@ public:
   RMC(std::vector<std::string>);
   ~RMC();
 
-  bool is_valid(std::string, std::string);
-
   void print_raw_data();
   void print_formatted_data();
 };
@@ -64,26 +59,6 @@ RMC::RMC(std::vector<std::string> core_data)
 
 RMC::~RMC()
 {
-}
-
-// https://www.tigoe.com/pcomp/code/Processing/127
-
-bool RMC::is_valid(std::string core_data, std::string checksum)
-{
-  std::string data = core_data.substr(1);
-
-  int check = 0;
-
-  for (int i = 0; i < (int)data.size(); i++)
-  {
-    check = char(check ^ data.at(i));
-  }
-
-  char hex_check[20];
-
-  sprintf(hex_check, "%X", check);
-
-  return hex_check == checksum;
 }
 
 void RMC::print_raw_data()

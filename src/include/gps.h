@@ -79,9 +79,9 @@ void GPS::parse_sample(std::string sample)
 {
   // First we get the checksum.
 
-  std::vector<std::string> initial_split = Utils::clean_split(sample, "*");
+  std::vector<std::string> initial_split = Utils::split(sample, "*");
 
-  // Then we parse the RMC sentence. Even with the empty tokens.
+  // Then we parse the sample sentence. Even with the empty tokens.
 
   std::vector<std::string> core_data = Utils::split(initial_split[0], ",");
 
@@ -89,32 +89,30 @@ void GPS::parse_sample(std::string sample)
 
   core_data.push_back(initial_split[1]);
 
-#ifdef _WIN32
-  std::system("cls");
-#else
-  std::system("clear");
-#endif
-
-  if (type == "GNRMC" && rmc->is_valid(initial_split[0], initial_split[1]))
+  if (type == "GNRMC" && Utils::is_valid_sample(sample))
   {
+    Utils::clear_screen();
     rmc = new RMC(core_data);
     rmc->print_formatted_data();
   }
 
-  if (type == "GPGSV" and gsv->is_valid(initial_split[0], initial_split[1]))
+  if (type == "GPGSV" && Utils::is_valid_sample(sample))
   {
+    Utils::clear_screen();
     gsv = new GSV(core_data);
     gsv->print_data();
   }
 
-  if (type == "GNGSA" && gsa->is_valid(initial_split[0], initial_split[1]))
+  if (type == "GNGSA" && Utils::is_valid_sample(sample))
   {
+    Utils::clear_screen();
     gsa = new GSA(core_data);
     gsa->print_data();
   }
 
-  if (type == "GNGLL" && gll->is_valid(initial_split[0], initial_split[1]))
+  if (type == "GNGLL" && Utils::is_valid_sample(sample))
   {
+    Utils::clear_screen();
     gll = new GLL(core_data);
     gll->print_formatted_data();
   }
