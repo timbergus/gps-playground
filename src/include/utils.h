@@ -101,7 +101,7 @@ bool Utils::is_valid_sample(std::string sample)
 
   int check = 0;
 
-  for (int i = 0; i < (int)data.size(); i++)
+  for (size_t i = 0; i < data.size(); i++)
   {
     check = char(check ^ data.at(i));
   }
