@@ -1,7 +1,7 @@
 BUILD=build
 
 init:
-	conan install . -if $(BUILD) && cmake -B $(BUILD)
+	conan install . -of $(BUILD) --build=fmt/10.1.1 && cmake -B $(BUILD)
 
 build_project:
 	cmake --build $(BUILD)
