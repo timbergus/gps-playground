@@ -4,15 +4,7 @@
 #include <chrono>
 #include <thread>
 
-#include "gpsTools.h"
-#include "printer.h"
-
 #include "gps.h"
-
-#include "gngll.h"
-#include "gngsa.h"
-#include "gnrmc.h"
-#include "gpgsv.h"
 
 std::vector<std::tuple<double, double>> getCoordinates(
     std::string_view fileName,
@@ -34,13 +26,13 @@ std::vector<std::tuple<double, double>> getCoordinates(
 
     if (type == "$GNRMC")
     {
-      if (GPSTools::isValidSample(measure))
+      if (GPS::isValidSample(measure))
       {
-        auto sample = GNRMC::parse(measure);
+        auto sample = GPS::parseRMC(measure);
 
         coordinates.push_back(std::make_tuple(
-            GPSTools::parseLatitude(sample.latitude),
-            GPSTools::parseLongitude(sample.longitude, sample.longitudeDirection)));
+            GPS::parseLatitude(sample.latitude),
+            GPS::parseLongitude(sample.longitude, sample.longitudeDirection)));
       }
     }
     if (isRealtime)

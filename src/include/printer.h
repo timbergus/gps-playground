@@ -1,25 +1,26 @@
 #pragma once
 
-#include "gpsTools.h"
+#include <fmt/format.h>
+#include <fmt/color.h>
 
-#include "gngll.h"
-#include "gngsa.h"
-#include "gnrmc.h"
-#include "gpgsv.h"
+#include "gps.h"
 
 class Printer
 {
 private:
-  static void printGNGLL(GNGLLProtocol);
-  static void printGNGSA(GNGSAProtocol);
-  static void printGNRMC(GNRMCProtocol);
-  static void printGPGSV(GPGSVProtocol);
+  static void printGGA(GGA);
+  static void printGLL(GLL);
+  static void printGSA(GSA);
+  static void printGSV(GSV);
+  static void printRMC(RMC);
+  static void printVTG(VTG);
+  static void printZDA(ZDA);
 
   static void printTitle(std::string_view);
   static void printSubtitle(std::string_view);
   static void printInfo(std::string_view, auto);
   static void printNumber(std::string_view, auto, std::string_view = "");
-  static void printSatellite(satelliteProtocol satellite);
+  static void printSatellite(Satellite satellite);
 
 public:
   Printer();

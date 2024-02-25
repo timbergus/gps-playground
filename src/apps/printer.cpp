@@ -1,41 +1,33 @@
 #include "printer.h"
 
-void Printer::printGNGLL(GNGLLProtocol data)
+void Printer::printGGA(GGA data)
 {
-  auto [hours, minutes, seconds] = GPSTools::parseUtcTime(data.utcTime);
+  printTitle(fmt::format("{} Sample Data", data.type.substr(1)));
+}
+
+void Printer::printGLL(GLL data)
+{
+  auto [hours, minutes, seconds] = GPS::parseUtcTime(data.utcTime);
 
   printTitle(fmt::format("{} Sample Data", data.type.substr(1)));
   printInfo("Time", fmt::format("{}:{}:{}", hours, minutes, seconds));
-  printNumber("Latitude", GPSTools::parseLatitude(data.latitude));
-  printNumber("Longitude", GPSTools::parseLongitude(data.longitude, data.longitudeDirection));
+  printNumber("Latitude", GPS::parseLatitude(data.latitude));
+  printNumber("Longitude", GPS::parseLongitude(data.longitude, data.longitudeDirection));
   printInfo("Status", data.status);
 }
 
-void Printer::printGNGSA(GNGSAProtocol data)
+void Printer::printGSA(GSA data)
 {
   printTitle(fmt::format("{} Sample Data", data.type.substr(1)));
   printInfo("Mode", data.mode);
   printInfo("Fix Type", data.fixType);
-  printInfo("Satellite", GPSTools::stringifyVector(data.satellites));
+  printInfo("Satellite", GPS::stringifyVector(data.satellites));
   printInfo("PDOP", data.PDOP);
   printInfo("HDOP", data.HDOP);
   printInfo("VDOP", data.VDOP);
 }
 
-void Printer::printGNRMC(GNRMCProtocol data)
-{
-  auto [hours, minutes, seconds] = GPSTools::parseUtcTime(data.utcTime);
-  auto [day, month, year] = GPSTools::parseUtcTime(data.utcTime);
-
-  printTitle(fmt::format("{} Sample Data", data.type.substr(1)));
-  printInfo("Time", fmt::format("{}:{}:{}", hours, minutes, seconds));
-  printInfo("Date", fmt::format("{}:{}:{}", day, month, year));
-  printNumber("Latitude", GPSTools::parseLatitude(data.latitude));
-  printNumber("Longitude", GPSTools::parseLongitude(data.longitude, data.longitudeDirection));
-  printNumber("Speed", GPSTools::parseSpeed(data.speed, GPSTools::ms), "m/s");
-}
-
-void Printer::printGPGSV(GPGSVProtocol data)
+void Printer::printGSV(GSV data)
 {
   printTitle(fmt::format("{} Sample Data", data.type.substr(1)));
   printInfo("Number of Messages", data.numberOfMessages);
@@ -50,6 +42,29 @@ void Printer::printGPGSV(GPGSVProtocol data)
   }
 }
 
+void Printer::printRMC(RMC data)
+{
+  auto [hours, minutes, seconds] = GPS::parseUtcTime(data.utcTime);
+  auto [day, month, year] = GPS::parseUtcTime(data.utcTime);
+
+  printTitle(fmt::format("{} Sample Data", data.type.substr(1)));
+  printInfo("Time", fmt::format("{}:{}:{}", hours, minutes, seconds));
+  printInfo("Date", fmt::format("{}:{}:{}", day, month, year));
+  printNumber("Latitude", GPS::parseLatitude(data.latitude));
+  printNumber("Longitude", GPS::parseLongitude(data.longitude, data.longitudeDirection));
+  printNumber("Speed", GPS::parseSpeed(data.speed, GPS::ms), "m/s");
+}
+
+void Printer::printVTG(VTG data)
+{
+  printTitle(fmt::format("{} Sample Data", data.type.substr(1)));
+}
+
+void Printer::printZDA(ZDA data)
+{
+  printTitle(fmt::format("{} Sample Data", data.type.substr(1)));
+}
+
 Printer::Printer()
 {
 }
@@ -60,27 +75,39 @@ Printer::~Printer()
 
 void Printer::print(std::string_view sample)
 {
-  auto type = GPSTools::split(sample, ',').at(0);
+  auto type = GPS::split(sample, ',').at(0);
 
-  if (type == "$GNGLL")
+  if (type.find("GGA"))
   {
-    printGNGLL(GNGLL::parse(sample));
+    printGLL(GPS::parseGLL(sample));
   }
-  else if (type == "$GNGSA")
+  else if (type.find("GLL"))
   {
-    printGNGSA(GNGSA::parse(sample));
+    printGLL(GPS::parseGLL(sample));
   }
-  else if (type == "$GNRMC")
+  else if (type.find("GSA"))
   {
-    printGNRMC(GNRMC::parse(sample));
+    printGSA(GPS::parseGSA(sample));
   }
-  else if (type == "$GPGSV")
+  else if (type.find("GSV"))
   {
-    printGPGSV(GPGSV::parse(sample));
+    printGSV(GPS::parseGSV(sample));
+  }
+  else if (type.find("RMC"))
+  {
+    printRMC(GPS::parseRMC(sample));
+  }
+  else if (type.find("VTG"))
+  {
+    printVTG(GPS::parseVTG(sample));
+  }
+  else if (type.find("ZDA"))
+  {
+    printZDA(GPS::parseZDA(sample));
   }
   else
   {
-    fmt::println("This is not working.");
+    fmt::println("This is not working :(");
   }
 }
 
@@ -108,7 +135,7 @@ void Printer::printNumber(std::string_view label, auto value, std::string_view u
       fmt::format(fg(fmt::color::blue_violet), "{}", units));
 }
 
-void Printer::printSatellite(satelliteProtocol satellite)
+void Printer::printSatellite(Satellite satellite)
 {
   fmt::print(
       "{1} {2} {0} {3} {4} {0} {5} {6} {0} {7} {8}\n",
