@@ -20,10 +20,16 @@ I'm building this project to use it to parse GPS data from a GPS unit attached t
 make clean
 ```
 
+## Init
+
+```bash
+make init
+```
+
 ## Build & Run
 
 ```bash
-make && make start
+make project && make start
 ```
 
 ## Data

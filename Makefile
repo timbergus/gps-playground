@@ -1,13 +1,17 @@
 BUILD=build
+PROJECT=gps-playground
 
 init:
-	conan install . -of $(BUILD) --build=fmt/10.1.1 && cmake -B $(BUILD)
+	cmake -B $(BUILD)
 
-build_project:
+project:
 	cmake --build $(BUILD)
 
 start:
-	./$(BUILD)/gps_playground
+	./$(BUILD)/$(PROJECT)
+
+test:
+	ctest --test-dir $(BUILD)
 
 clean:
 	rm -rf $(BUILD)
