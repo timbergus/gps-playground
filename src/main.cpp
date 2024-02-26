@@ -1,97 +1,116 @@
-#include <iostream>
 #include <raylib.h>
 #include <fstream>
-#include <chrono>
+#include <tuple>
 #include <thread>
 #include <fmt/format.h>
 
 #include "gps.h"
 
-std::vector<std::tuple<double, double, std::string>> getCoordinates(
-    std::string_view fileName,
-    bool isRealtime = false)
+RMC measure;
+
+void getSample(std::string_view fileName)
 {
   int samplesPerSecond = 12;
 
-  std::fstream measures;
-  std::string measure;
+  std::fstream samples;
+  std::string sample;
 
-  std::vector<std::tuple<double, double, std::string>> coordinates;
+  samples.open(fileName, std::ios::in);
 
-  measures.open(fileName, std::ios::in);
-
-  while (std::getline(measures, measure))
+  while (std::getline(samples, sample))
   {
-    auto type = measure.substr(0, 6);
-
-    if (type.find("RMC") != std::string::npos)
+    if (sample.find("RMC") != std::string::npos)
     {
-      if (GPS::isValidSample(measure))
+      if (GPS::isValidSample(sample))
       {
-        auto sample = GPS::parseRMC(measure);
-
-        auto [hours, minutes, seconds] = GPS::parseUtcTime(sample.utcTime);
-
-        auto time = fmt::format("{}:{}:{}", hours, minutes, seconds);
-
-        coordinates.push_back(std::make_tuple(
-            GPS::parseLatitude(sample.latitude),
-            GPS::parseLongitude(sample.longitude, sample.longitudeDirection),
-            time));
+        measure = GPS::parseRMC(sample);
       }
     }
-    if (isRealtime)
-    {
-      std::this_thread::sleep_for(std::chrono::milliseconds(1000 / samplesPerSecond));
-    }
-  }
 
-  return coordinates;
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000 / samplesPerSecond));
+  }
 }
 
-int main(int, char **)
+int main()
 {
-  std::vector<std::tuple<double, double, std::string>> coordinates{
-      getCoordinates("./src/data/today.txt"),
-  };
+  int scale = 5;
+
+  int DEVICE_WIDTH = 128 * scale;
+  int DEVICE_HEIGHT = 128 * scale;
+
+  int TOP = 124;
+  int RIGHT = DEVICE_WIDTH;
+  int BOTTOM = DEVICE_HEIGHT;
+  int LEFT = 0;
+  int HEIGHT = DEVICE_HEIGHT - 124;
+
+  int CENTER_X = DEVICE_WIDTH / 2;
+  int CENTER_Y = TOP + (HEIGHT / 2);
+
+  int ZOOM = 1000000;
+
+  double REF_LATITUDE = 40.2500666;
+  double REF_LONGITUDE = -3.4022613;
 
   SetConfigFlags(FLAG_MSAA_4X_HINT);
-  InitWindow(400, 400, "GPS Data Explorer");
+  InitWindow(DEVICE_WIDTH, DEVICE_HEIGHT, "GPS Data Explorer");
 
   SetTargetFPS(120);
 
-  const int ZOOM = 7000000;
+  // We are going to use a thread to read the GPS samples. It will write
+  // the current sample in a global variable shared by the reading thread
+  // and the main thread, so the main thread will draw at 120 fps, while
+  // the reading thread will get a new sample every second.
 
-  auto [refLatitude, refLongitude, refTime] = coordinates.at(0);
+  std::thread t(getSample, "./src/data/today.txt");
 
-  int coord = 0;
+  std::vector<std::tuple<double, double>> coords;
 
   while (!WindowShouldClose())
   {
     BeginDrawing();
-    ClearBackground(GRAY);
-    DrawText("GPS Data", 10, 10, 20, WHITE);
+    ClearBackground(LIGHTGRAY);
 
-    for (int i = 0; i < coord; i++)
+    DrawFPS(10, BOTTOM - 30);
+
+    if (measure.type.find("RMC") != std::string::npos)
     {
-      auto [latitude, longitude, time] = coordinates[i];
-      DrawCircle((latitude * ZOOM) + 200 - (refLatitude * ZOOM), (longitude * ZOOM) + 200 - (refLongitude * ZOOM), 5, YELLOW);
+      auto latitude = GPS::parseLatitude(measure.latitude);
+      auto longitude = GPS::parseLongitude(measure.longitude, measure.longitudeDirection);
+      auto [hours, minutes, seconds] = GPS::parseUtcDate(measure.utcTime);
+      auto [day, month, year] = GPS::parseUtcDate(measure.utcDate);
+
+      DrawText(fmt::format("Data From {} ({}/{}/{})", measure.type.substr(1), day, month, year).data(), 10, 10, 20, BLACK);
+
+      DrawRectangle(0, 35, DEVICE_WIDTH, 3, BLACK);
+      DrawText(fmt::format("Latitude: {}", latitude).data(), 10, 50, 20, BLACK);
+      DrawText(fmt::format("Longitude: {}", longitude).data(), 10, 70, 20, BLACK);
+      DrawText(fmt::format("Time: {}:{}:{}", hours, minutes, seconds).data(), 10, 90, 20, BLACK);
+
+      coords.push_back(std::make_tuple(latitude, longitude));
+
+      DrawRectangle(0, 120, DEVICE_WIDTH, 6, BLACK);
+
+      // GRID
+
+      DrawLine(CENTER_X, TOP, CENTER_X, BOTTOM, BLACK);
+      DrawLine(LEFT, CENTER_Y, RIGHT, CENTER_Y, BLACK);
+
+      // SAMPLES
+      // If we want to have a historic we need to store the coords and the plot the
+      // full list of coords.
+
+      for (auto coord : coords)
+      {
+        auto [lat, lng] = coord;
+        DrawCircle(CENTER_X + (lat - REF_LATITUDE) * ZOOM, CENTER_Y + (lng - REF_LONGITUDE) * ZOOM, 5, RED);
+      }
     }
 
-    auto [latitude, longitude, time] = coordinates[coord];
-    DrawRectangle(10, 40, 150, 20, GRAY);
-    DrawText(fmt::format("Time: {}", time).c_str(), 10, 40, 20, GREEN);
-
-    DrawCircle(200, 200, 5, BLACK);
-    DrawCircle(200 + refLatitude, 200 + refLongitude, 5, RED);
     EndDrawing();
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
-    if (coord < static_cast<int>(coordinates.size()) - 1)
-    {
-      coord++;
-    }
   }
+
+  t.join();
 
   CloseWindow();
 

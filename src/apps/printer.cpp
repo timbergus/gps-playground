@@ -75,7 +75,7 @@ Printer::~Printer()
 
 void Printer::print(std::string_view sample)
 {
-  auto type = GPS::split(sample, ',').at(0);
+  auto type = sample.substr(0, 6);
 
   if (type.find("GGA") != std::string::npos)
   {

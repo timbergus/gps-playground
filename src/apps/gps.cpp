@@ -19,20 +19,20 @@ GGA GPS::parseGGA(std::string_view sample)
 {
   auto tokens = tokenize(sample);
 
-  GGA data{
-      .type = tokens.at(0),
-      .utcTime = tokens.at(1),
-      .latitude = tokens.at(2),
-      .latitudeDirection = tokens.at(3),
-      .longitude = tokens.at(4),
-      .longitudeDirection = tokens.at(5),
-      .quality = tokens.at(6),
-      .satellitesUsed = tokens.at(7),
-      .HDOP = tokens.at(8),
-      .altitude = tokens.at(9),
-      .geoidalSeparation = tokens.at(11),
-      .DGPS = tokens.at(14),
-  };
+  GGA data;
+
+  data.type = tokens.at(0);
+  data.utcTime = tokens.at(1);
+  data.latitude = tokens.at(2);
+  data.latitudeDirection = tokens.at(3);
+  data.longitude = tokens.at(4);
+  data.longitudeDirection = tokens.at(5);
+  data.quality = tokens.at(6);
+  data.satellitesUsed = tokens.at(7);
+  data.HDOP = tokens.at(8);
+  data.altitude = tokens.at(9);
+  data.geoidalSeparation = tokens.at(11);
+  data.DGPS = tokens.at(14);
 
   return data;
 }
@@ -41,15 +41,15 @@ GLL GPS::parseGLL(std::string_view sample)
 {
   auto tokens = tokenize(sample);
 
-  GLL data{
-      .type = tokens.at(0),
-      .latitude = tokens.at(1),
-      .latitudeDirection = tokens.at(2),
-      .longitude = tokens.at(3),
-      .longitudeDirection = tokens.at(4),
-      .utcTime = tokens.at(5),
-      .status = tokens.at(6),
-  };
+  GLL data;
+
+  data.type = tokens.at(0);
+  data.latitude = tokens.at(1);
+  data.latitudeDirection = tokens.at(2);
+  data.longitude = tokens.at(3);
+  data.longitudeDirection = tokens.at(4);
+  data.utcTime = tokens.at(5);
+  data.status = tokens.at(6);
 
   return data;
 }
@@ -58,14 +58,14 @@ GSA GPS::parseGSA(std::string_view sample)
 {
   auto tokens = tokenize(sample);
 
-  GSA data{
-      .type = tokens.at(0),
-      .mode = tokens.at(1),
-      .fixType = tokens.at(2),
-      .PDOP = tokens.at(15),
-      .HDOP = tokens.at(16),
-      .VDOP = tokens.at(17),
-  };
+  GSA data;
+
+  data.type = tokens.at(0);
+  data.mode = tokens.at(1);
+  data.fixType = tokens.at(2);
+  data.PDOP = tokens.at(15);
+  data.HDOP = tokens.at(16);
+  data.VDOP = tokens.at(17);
 
   for (int i = 0; i < 12; i++)
   {
@@ -79,12 +79,12 @@ GSV GPS::parseGSV(std::string_view sample)
 {
   auto tokens = tokenize(sample);
 
-  GSV data{
-      .type = tokens.at(0),
-      .numberOfMessages = tokens.at(1),
-      .sequenceNumber = tokens.at(2),
-      .satellitesInView = tokens.at(3),
-  };
+  GSV data;
+
+  data.type = tokens.at(0);
+  data.numberOfMessages = tokens.at(1);
+  data.sequenceNumber = tokens.at(2);
+  data.satellitesInView = tokens.at(3);
 
   for (int i = 1; i <= std::stoi(data.numberOfMessages); i++)
   {
@@ -105,19 +105,19 @@ RMC GPS::parseRMC(std::string_view sample)
 {
   auto tokens = tokenize(sample);
 
-  RMC data{
-      .type = tokens.at(0),
-      .utcTime = tokens.at(1),
-      .status = tokens.at(2),
-      .latitude = tokens.at(3),
-      .latitudeDirection = tokens.at(4),
-      .longitude = tokens.at(5),
-      .longitudeDirection = tokens.at(6),
-      .speed = tokens.at(7),
-      .course = tokens.at(8),
-      .utcDate = tokens.at(9),
-      .mode = tokens.at(11),
-  };
+  RMC data;
+
+  data.type = tokens.at(0);
+  data.utcTime = tokens.at(1);
+  data.status = tokens.at(2);
+  data.latitude = tokens.at(3);
+  data.latitudeDirection = tokens.at(4);
+  data.longitude = tokens.at(5);
+  data.longitudeDirection = tokens.at(6);
+  data.speed = tokens.at(7);
+  data.course = tokens.at(8);
+  data.utcDate = tokens.at(9);
+  data.mode = tokens.at(11);
 
   return data;
 }
@@ -126,14 +126,14 @@ VTG GPS::parseVTG(std::string_view sample)
 {
   auto tokens = tokenize(sample);
 
-  VTG data{
-      .type = tokens.at(0),
-      .course = tokens.at(1),
-      .courseMagnetic = tokens.at(3),
-      .speedKn = tokens.at(5),
-      .speedKh = tokens.at(7),
-      .mode = tokens.at(9),
-  };
+  VTG data;
+
+  data.type = tokens.at(0);
+  data.course = tokens.at(1);
+  data.courseMagnetic = tokens.at(3);
+  data.speedKn = tokens.at(5);
+  data.speedKh = tokens.at(7);
+  data.mode = tokens.at(9);
 
   return data;
 }
@@ -142,15 +142,15 @@ ZDA GPS::parseZDA(std::string_view sample)
 {
   auto tokens = tokenize(sample);
 
-  ZDA data{
-      .type = tokens.at(0),
-      .utcTime = tokens.at(1),
-      .utcDay = tokens.at(2),
-      .utcMonth = tokens.at(3),
-      .utcYear = tokens.at(4),
-      .localZoneHours = tokens.at(5),
-      .localZoneMinutes = tokens.at(6),
-  };
+  ZDA data;
+
+  data.type = tokens.at(0);
+  data.utcTime = tokens.at(1);
+  data.utcDay = tokens.at(2);
+  data.utcMonth = tokens.at(3);
+  data.utcYear = tokens.at(4);
+  data.localZoneHours = tokens.at(5);
+  data.localZoneMinutes = tokens.at(6);
 
   return data;
 }
