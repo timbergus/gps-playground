@@ -62,7 +62,9 @@ int main(int, char **)
 
   const int ZOOM = 7000000;
 
-  auto [refLatitude, refLongitude, _] = coordinates.at(0);
+  auto [refLatitude, refLongitude, refTime] = coordinates.at(0);
+
+  int coord = 0;
 
   while (!WindowShouldClose())
   {
@@ -70,17 +72,25 @@ int main(int, char **)
     ClearBackground(GRAY);
     DrawText("GPS Data", 10, 10, 20, WHITE);
 
-    for (auto coord : coordinates)
+    for (int i = 0; i < coord; i++)
     {
-      auto [latitude, longitude, time] = coord;
-      DrawRectangle(10, 40, 150, 20, GRAY);
-      DrawText(fmt::format("Time: {}", time).c_str(), 10, 40, 20, GREEN);
+      auto [latitude, longitude, time] = coordinates[i];
       DrawCircle((latitude * ZOOM) + 200 - (refLatitude * ZOOM), (longitude * ZOOM) + 200 - (refLongitude * ZOOM), 5, YELLOW);
     }
+
+    auto [latitude, longitude, time] = coordinates[coord];
+    DrawRectangle(10, 40, 150, 20, GRAY);
+    DrawText(fmt::format("Time: {}", time).c_str(), 10, 40, 20, GREEN);
 
     DrawCircle(200, 200, 5, BLACK);
     DrawCircle(200 + refLatitude, 200 + refLongitude, 5, RED);
     EndDrawing();
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+    if (coord < static_cast<int>(coordinates.size()) - 1)
+    {
+      coord++;
+    }
   }
 
   CloseWindow();
