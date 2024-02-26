@@ -77,31 +77,31 @@ void Printer::print(std::string_view sample)
 {
   auto type = GPS::split(sample, ',').at(0);
 
-  if (type.find("GGA"))
+  if (type.find("GGA") != std::string::npos)
   {
     printGLL(GPS::parseGLL(sample));
   }
-  else if (type.find("GLL"))
+  else if (type.find("GLL") != std::string::npos)
   {
     printGLL(GPS::parseGLL(sample));
   }
-  else if (type.find("GSA"))
+  else if (type.find("GSA") != std::string::npos)
   {
     printGSA(GPS::parseGSA(sample));
   }
-  else if (type.find("GSV"))
+  else if (type.find("GSV") != std::string::npos)
   {
     printGSV(GPS::parseGSV(sample));
   }
-  else if (type.find("RMC"))
+  else if (type.find("RMC") != std::string::npos)
   {
     printRMC(GPS::parseRMC(sample));
   }
-  else if (type.find("VTG"))
+  else if (type.find("VTG") != std::string::npos)
   {
     printVTG(GPS::parseVTG(sample));
   }
-  else if (type.find("ZDA"))
+  else if (type.find("ZDA") != std::string::npos)
   {
     printZDA(GPS::parseZDA(sample));
   }

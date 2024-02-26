@@ -24,7 +24,7 @@ std::vector<std::tuple<double, double>> getCoordinates(
   {
     auto type = measure.substr(0, 6);
 
-    if (type == "$GNRMC")
+    if (type.find("RMC") != std::string::npos)
     {
       if (GPS::isValidSample(measure))
       {
