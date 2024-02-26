@@ -10,8 +10,7 @@ std::vector<std::tuple<double, double>> getCoordinates(
     std::string_view fileName,
     bool isRealtime = false)
 {
-  int samples = 11163;
-  double time = 1666.71;
+  int samplesPerSecond = 12;
 
   std::fstream measures;
   std::string measure;
@@ -37,7 +36,7 @@ std::vector<std::tuple<double, double>> getCoordinates(
     }
     if (isRealtime)
     {
-      std::this_thread::sleep_for(std::chrono::milliseconds((int)std::ceil(time * 1000 / samples)));
+      std::this_thread::sleep_for(std::chrono::milliseconds(1000 / samplesPerSecond));
     }
   }
 
