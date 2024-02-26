@@ -3,10 +3,11 @@
 #include <fstream>
 #include <chrono>
 #include <thread>
+#include <fmt/format.h>
 
 #include "gps.h"
 
-std::vector<std::tuple<double, double>> getCoordinates(
+std::vector<std::tuple<double, double, std::string>> getCoordinates(
     std::string_view fileName,
     bool isRealtime = false)
 {
@@ -15,7 +16,7 @@ std::vector<std::tuple<double, double>> getCoordinates(
   std::fstream measures;
   std::string measure;
 
-  std::vector<std::tuple<double, double>> coordinates;
+  std::vector<std::tuple<double, double, std::string>> coordinates;
 
   measures.open(fileName, std::ios::in);
 
@@ -29,9 +30,14 @@ std::vector<std::tuple<double, double>> getCoordinates(
       {
         auto sample = GPS::parseRMC(measure);
 
+        auto [hours, minutes, seconds] = GPS::parseUtcTime(sample.utcTime);
+
+        auto time = fmt::format("{}:{}:{}", hours, minutes, seconds);
+
         coordinates.push_back(std::make_tuple(
             GPS::parseLatitude(sample.latitude),
-            GPS::parseLongitude(sample.longitude, sample.longitudeDirection)));
+            GPS::parseLongitude(sample.longitude, sample.longitudeDirection),
+            time));
       }
     }
     if (isRealtime)
@@ -45,7 +51,7 @@ std::vector<std::tuple<double, double>> getCoordinates(
 
 int main(int, char **)
 {
-  std::vector<std::tuple<double, double>> coordinates{
+  std::vector<std::tuple<double, double, std::string>> coordinates{
       getCoordinates("./src/data/today.txt"),
   };
 
@@ -56,7 +62,7 @@ int main(int, char **)
 
   const int ZOOM = 7000000;
 
-  auto [refLatitude, refLongitude] = coordinates.at(0);
+  auto [refLatitude, refLongitude, _] = coordinates.at(0);
 
   while (!WindowShouldClose())
   {
@@ -66,7 +72,9 @@ int main(int, char **)
 
     for (auto coord : coordinates)
     {
-      auto [latitude, longitude] = coord;
+      auto [latitude, longitude, time] = coord;
+      DrawRectangle(10, 40, 150, 20, GRAY);
+      DrawText(fmt::format("Time: {}", time).c_str(), 10, 40, 20, GREEN);
       DrawCircle((latitude * ZOOM) + 200 - (refLatitude * ZOOM), (longitude * ZOOM) + 200 - (refLongitude * ZOOM), 5, YELLOW);
     }
 
