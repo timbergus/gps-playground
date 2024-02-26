@@ -39,3 +39,9 @@ It uses randomly generated data stored in `src/data/samples.txt`. It's a file wi
 ## Libraries
 
 To use [`format`](https://github.com/fmtlib/fmt), you need to install it with `brew` (maybe cloning it on Windows, or using something like [Conan](https://conan.io/)).
+
+## Resources
+
+[C++11/C++14 7. THREADS WITH SHARED MEMORY AND MUTEX - 2020](https://www.bogotobogo.com/cplusplus/C11/7_C11_Thread_Sharing_Memory.php)
+
+[Effective Modern C++:multi-threading](https://www.wangxinliu.com/tech/program/ModernCpp9/)
