@@ -15,144 +15,135 @@ GPS::~GPS()
 {
 }
 
-GGA GPS::parseGGA(std::string_view sample)
+std::any GPS::parse(std::string_view sample)
 {
   auto tokens = tokenize(sample);
 
-  GGA data;
+  auto type = tokens.at(0);
 
-  data.type = tokens.at(0);
-  data.utcTime = tokens.at(1);
-  data.latitude = tokens.at(2);
-  data.latitudeDirection = tokens.at(3);
-  data.longitude = tokens.at(4);
-  data.longitudeDirection = tokens.at(5);
-  data.quality = tokens.at(6);
-  data.satellitesUsed = tokens.at(7);
-  data.HDOP = tokens.at(8);
-  data.altitude = tokens.at(9);
-  data.geoidalSeparation = tokens.at(11);
-  data.DGPS = tokens.at(14);
-
-  return data;
-}
-
-GLL GPS::parseGLL(std::string_view sample)
-{
-  auto tokens = tokenize(sample);
-
-  GLL data;
-
-  data.type = tokens.at(0);
-  data.latitude = tokens.at(1);
-  data.latitudeDirection = tokens.at(2);
-  data.longitude = tokens.at(3);
-  data.longitudeDirection = tokens.at(4);
-  data.utcTime = tokens.at(5);
-  data.status = tokens.at(6);
-
-  return data;
-}
-
-GSA GPS::parseGSA(std::string_view sample)
-{
-  auto tokens = tokenize(sample);
-
-  GSA data;
-
-  data.type = tokens.at(0);
-  data.mode = tokens.at(1);
-  data.fixType = tokens.at(2);
-  data.PDOP = tokens.at(15);
-  data.HDOP = tokens.at(16);
-  data.VDOP = tokens.at(17);
-
-  for (int i = 0; i < 12; i++)
+  if (type.find("GGA") != std::string::npos)
   {
-    data.satellites.push_back(tokens[i + 3]);
+    GGA data;
+
+    data.type = tokens.at(0);
+    data.utcTime = tokens.at(1);
+    data.latitude = tokens.at(2);
+    data.latitudeDirection = tokens.at(3);
+    data.longitude = tokens.at(4);
+    data.longitudeDirection = tokens.at(5);
+    data.quality = tokens.at(6);
+    data.satellitesUsed = tokens.at(7);
+    data.HDOP = tokens.at(8);
+    data.altitude = tokens.at(9);
+    data.geoidalSeparation = tokens.at(11);
+    data.DGPS = tokens.at(14);
+
+    return data;
   }
-
-  return data;
-}
-
-GSV GPS::parseGSV(std::string_view sample)
-{
-  auto tokens = tokenize(sample);
-
-  GSV data;
-
-  data.type = tokens.at(0);
-  data.numberOfMessages = tokens.at(1);
-  data.sequenceNumber = tokens.at(2);
-  data.satellitesInView = tokens.at(3);
-
-  for (int i = 1; i <= std::stoi(data.numberOfMessages); i++)
+  else if (type.find("GLL") != std::string::npos)
   {
-    Satellite satellite;
+    GLL data;
 
-    satellite.id = tokens[i * 4 + 0];
-    satellite.elevation = tokens[i * 4 + 1];
-    satellite.azimuth = tokens[i * 4 + 2];
-    satellite.snr = tokens[i * 4 + 3];
+    data.type = tokens.at(0);
+    data.latitude = tokens.at(1);
+    data.latitudeDirection = tokens.at(2);
+    data.longitude = tokens.at(3);
+    data.longitudeDirection = tokens.at(4);
+    data.utcTime = tokens.at(5);
+    data.status = tokens.at(6);
 
-    data.satellites.push_back(satellite);
+    return data;
   }
+  else if (type.find("GSA") != std::string::npos)
+  {
+    GSA data;
 
-  return data;
-}
+    data.type = tokens.at(0);
+    data.mode = tokens.at(1);
+    data.fixType = tokens.at(2);
+    data.PDOP = tokens.at(15);
+    data.HDOP = tokens.at(16);
+    data.VDOP = tokens.at(17);
 
-RMC GPS::parseRMC(std::string_view sample)
-{
-  auto tokens = tokenize(sample);
+    for (int i = 0; i < 12; i++)
+    {
+      data.satellites.push_back(tokens[i + 3]);
+    }
 
-  RMC data;
+    return data;
+  }
+  else if (type.find("GSV") != std::string::npos)
+  {
+    GSV data;
 
-  data.type = tokens.at(0);
-  data.utcTime = tokens.at(1);
-  data.status = tokens.at(2);
-  data.latitude = tokens.at(3);
-  data.latitudeDirection = tokens.at(4);
-  data.longitude = tokens.at(5);
-  data.longitudeDirection = tokens.at(6);
-  data.speed = tokens.at(7);
-  data.course = tokens.at(8);
-  data.utcDate = tokens.at(9);
-  data.mode = tokens.at(11);
+    data.type = tokens.at(0);
+    data.numberOfMessages = tokens.at(1);
+    data.sequenceNumber = tokens.at(2);
+    data.satellitesInView = tokens.at(3);
 
-  return data;
-}
+    for (int i = 1; i <= std::stoi(data.numberOfMessages); i++)
+    {
+      Satellite satellite;
 
-VTG GPS::parseVTG(std::string_view sample)
-{
-  auto tokens = tokenize(sample);
+      satellite.id = tokens[i * 4 + 0];
+      satellite.elevation = tokens[i * 4 + 1];
+      satellite.azimuth = tokens[i * 4 + 2];
+      satellite.snr = tokens[i * 4 + 3];
 
-  VTG data;
+      data.satellites.push_back(satellite);
+    }
 
-  data.type = tokens.at(0);
-  data.course = tokens.at(1);
-  data.courseMagnetic = tokens.at(3);
-  data.speedKn = tokens.at(5);
-  data.speedKh = tokens.at(7);
-  data.mode = tokens.at(9);
+    return data;
+  }
+  else if (type.find("RMC") != std::string::npos)
+  {
+    RMC data;
 
-  return data;
-}
+    data.type = tokens.at(0);
+    data.utcTime = tokens.at(1);
+    data.status = tokens.at(2);
+    data.latitude = tokens.at(3);
+    data.latitudeDirection = tokens.at(4);
+    data.longitude = tokens.at(5);
+    data.longitudeDirection = tokens.at(6);
+    data.speed = tokens.at(7);
+    data.course = tokens.at(8);
+    data.utcDate = tokens.at(9);
+    data.mode = tokens.at(11);
 
-ZDA GPS::parseZDA(std::string_view sample)
-{
-  auto tokens = tokenize(sample);
+    return data;
+  }
+  else if (type.find("VTG") != std::string::npos)
+  {
+    VTG data;
 
-  ZDA data;
+    data.type = tokens.at(0);
+    data.course = tokens.at(1);
+    data.courseMagnetic = tokens.at(3);
+    data.speedKn = tokens.at(5);
+    data.speedKh = tokens.at(7);
+    data.mode = tokens.at(9);
 
-  data.type = tokens.at(0);
-  data.utcTime = tokens.at(1);
-  data.utcDay = tokens.at(2);
-  data.utcMonth = tokens.at(3);
-  data.utcYear = tokens.at(4);
-  data.localZoneHours = tokens.at(5);
-  data.localZoneMinutes = tokens.at(6);
+    return data;
+  }
+  else if (type.find("ZDA") != std::string::npos)
+  {
+    ZDA data;
 
-  return data;
+    data.type = tokens.at(0);
+    data.utcTime = tokens.at(1);
+    data.utcDay = tokens.at(2);
+    data.utcMonth = tokens.at(3);
+    data.utcYear = tokens.at(4);
+    data.localZoneHours = tokens.at(5);
+    data.localZoneMinutes = tokens.at(6);
+
+    return data;
+  }
+  else
+  {
+    throw std::runtime_error("Sample type not supported");
+  }
 }
 
 // Tools

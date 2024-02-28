@@ -5,6 +5,7 @@
 #include <string>
 #include <sstream>
 #include <tuple>
+#include <any>
 
 struct GGA
 {
@@ -119,13 +120,7 @@ public:
   GPS();
   ~GPS();
 
-  static GGA parseGGA(std::string_view);
-  static GLL parseGLL(std::string_view);
-  static GSA parseGSA(std::string_view);
-  static GSV parseGSV(std::string_view);
-  static RMC parseRMC(std::string_view);
-  static VTG parseVTG(std::string_view);
-  static ZDA parseZDA(std::string_view);
+  static std::any parse(std::string_view);
 
   // Tools
 

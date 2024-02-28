@@ -5,8 +5,9 @@
 #include <fmt/format.h>
 
 #include "gps.h"
+#include "printer.h"
 
-RMC measure;
+std::any measure;
 
 void getSample(std::string_view fileName)
 {
@@ -19,12 +20,9 @@ void getSample(std::string_view fileName)
 
   while (std::getline(samples, sample))
   {
-    if (sample.find("RMC") != std::string::npos)
+    if (GPS::isValidSample(sample) && sample.substr(0, 6).find("RMC") != std::string::npos)
     {
-      if (GPS::isValidSample(sample))
-      {
-        measure = GPS::parseRMC(sample);
-      }
+      measure = GPS::parse(sample);
     }
 
     std::this_thread::sleep_for(std::chrono::milliseconds(1000 / samplesPerSecond));
@@ -73,37 +71,51 @@ int main()
 
     DrawFPS(10, BOTTOM - 30);
 
-    if (measure.type.find("RMC") != std::string::npos)
+    if (measure.has_value())
     {
-      auto latitude = GPS::parseLatitude(measure.latitude);
-      auto longitude = GPS::parseLongitude(measure.longitude, measure.longitudeDirection);
-      auto [hours, minutes, seconds] = GPS::parseUtcDate(measure.utcTime);
-      auto [day, month, year] = GPS::parseUtcDate(measure.utcDate);
+      auto extractedSample{std::any_cast<RMC>(measure)};
 
-      DrawText(fmt::format("Data From {} ({}/{}/{})", measure.type.substr(1), day, month, year).data(), 10, 10, 20, BLACK);
-
-      DrawRectangle(0, 35, DEVICE_WIDTH, 3, BLACK);
-      DrawText(fmt::format("Latitude: {}", latitude).data(), 10, 50, 20, BLACK);
-      DrawText(fmt::format("Longitude: {}", longitude).data(), 10, 70, 20, BLACK);
-      DrawText(fmt::format("Time: {}:{}:{}", hours, minutes, seconds).data(), 10, 90, 20, BLACK);
-
-      coords.push_back(std::make_tuple(latitude, longitude));
-
-      DrawRectangle(0, 120, DEVICE_WIDTH, 6, BLACK);
-
-      // GRID
-
-      DrawLine(CENTER_X, TOP, CENTER_X, BOTTOM, BLACK);
-      DrawLine(LEFT, CENTER_Y, RIGHT, CENTER_Y, BLACK);
-
-      // SAMPLES
-      // If we want to have a historic we need to store the coords and the plot the
-      // full list of coords.
-
-      for (auto coord : coords)
+      if (extractedSample.type.find("RMC") != std::string::npos)
       {
-        auto [lat, lng] = coord;
-        DrawCircle(CENTER_X + (lat - REF_LATITUDE) * ZOOM, CENTER_Y + (lng - REF_LONGITUDE) * ZOOM, 5, RED);
+        auto latitude = GPS::parseLatitude(extractedSample.latitude);
+        auto longitude = GPS::parseLongitude(
+            extractedSample.longitude,
+            extractedSample.longitudeDirection);
+
+        DrawText(fmt::format(
+                     "Data From {} ({})",
+                     extractedSample.type.substr(1),
+                     Printer::formatUtcDate(GPS::parseUtcDate(extractedSample.utcDate)))
+                     .data(),
+                 10, 10, 20, BLACK);
+
+        DrawRectangle(0, 35, DEVICE_WIDTH, 3, BLACK);
+        DrawText(fmt::format("Latitude: {}", latitude).data(), 10, 50, 20, BLACK);
+        DrawText(fmt::format("Longitude: {}", longitude).data(), 10, 70, 20, BLACK);
+        DrawText(fmt::format(
+                     "Time: {}",
+                     Printer::formatUtcTime(GPS::parseUtcDate(extractedSample.utcTime)))
+                     .data(),
+                 10, 90, 20, BLACK);
+
+        coords.push_back(std::make_tuple(latitude, longitude));
+
+        DrawRectangle(0, 120, DEVICE_WIDTH, 6, BLACK);
+
+        // GRID
+
+        DrawLine(CENTER_X, TOP, CENTER_X, BOTTOM, BLACK);
+        DrawLine(LEFT, CENTER_Y, RIGHT, CENTER_Y, BLACK);
+
+        // SAMPLES
+        // If we want to have a historic we need to store the coords and the plot the
+        // full list of coords.
+
+        for (auto coord : coords)
+        {
+          auto [lat, lng] = coord;
+          DrawCircle(CENTER_X + (lat - REF_LATITUDE) * ZOOM, CENTER_Y + (lng - REF_LONGITUDE) * ZOOM, 5, RED);
+        }
       }
     }
 

@@ -1,114 +1,11 @@
 #include "printer.h"
 
-void Printer::printGGA(GGA data)
-{
-  printTitle(fmt::format("{} Sample Data", data.type.substr(1)));
-}
-
-void Printer::printGLL(GLL data)
-{
-  auto [hours, minutes, seconds] = GPS::parseUtcTime(data.utcTime);
-
-  printTitle(fmt::format("{} Sample Data", data.type.substr(1)));
-  printInfo("Time", fmt::format("{}:{}:{}", hours, minutes, seconds));
-  printNumber("Latitude", GPS::parseLatitude(data.latitude));
-  printNumber("Longitude", GPS::parseLongitude(data.longitude, data.longitudeDirection));
-  printInfo("Status", data.status);
-}
-
-void Printer::printGSA(GSA data)
-{
-  printTitle(fmt::format("{} Sample Data", data.type.substr(1)));
-  printInfo("Mode", data.mode);
-  printInfo("Fix Type", data.fixType);
-  printInfo("Satellite", GPS::stringifyVector(data.satellites));
-  printInfo("PDOP", data.PDOP);
-  printInfo("HDOP", data.HDOP);
-  printInfo("VDOP", data.VDOP);
-}
-
-void Printer::printGSV(GSV data)
-{
-  printTitle(fmt::format("{} Sample Data", data.type.substr(1)));
-  printInfo("Number of Messages", data.numberOfMessages);
-  printInfo("Sequence Number", data.sequenceNumber);
-  printInfo("Satellites in View", data.satellitesInView);
-
-  printSubtitle("Satellites");
-
-  for (int i = 0; i < std::stoi(data.numberOfMessages); i++)
-  {
-    printSatellite(data.satellites[i]);
-  }
-}
-
-void Printer::printRMC(RMC data)
-{
-  auto [hours, minutes, seconds] = GPS::parseUtcTime(data.utcTime);
-  auto [day, month, year] = GPS::parseUtcTime(data.utcTime);
-
-  printTitle(fmt::format("{} Sample Data", data.type.substr(1)));
-  printInfo("Time", fmt::format("{}:{}:{}", hours, minutes, seconds));
-  printInfo("Date", fmt::format("{}:{}:{}", day, month, year));
-  printNumber("Latitude", GPS::parseLatitude(data.latitude));
-  printNumber("Longitude", GPS::parseLongitude(data.longitude, data.longitudeDirection));
-  printNumber("Speed", GPS::parseSpeed(data.speed, GPS::ms), "m/s");
-}
-
-void Printer::printVTG(VTG data)
-{
-  printTitle(fmt::format("{} Sample Data", data.type.substr(1)));
-}
-
-void Printer::printZDA(ZDA data)
-{
-  printTitle(fmt::format("{} Sample Data", data.type.substr(1)));
-}
-
 Printer::Printer()
 {
 }
 
 Printer::~Printer()
 {
-}
-
-void Printer::print(std::string_view sample)
-{
-  auto type = sample.substr(0, 6);
-
-  if (type.find("GGA") != std::string::npos)
-  {
-    printGLL(GPS::parseGLL(sample));
-  }
-  else if (type.find("GLL") != std::string::npos)
-  {
-    printGLL(GPS::parseGLL(sample));
-  }
-  else if (type.find("GSA") != std::string::npos)
-  {
-    printGSA(GPS::parseGSA(sample));
-  }
-  else if (type.find("GSV") != std::string::npos)
-  {
-    printGSV(GPS::parseGSV(sample));
-  }
-  else if (type.find("RMC") != std::string::npos)
-  {
-    printRMC(GPS::parseRMC(sample));
-  }
-  else if (type.find("VTG") != std::string::npos)
-  {
-    printVTG(GPS::parseVTG(sample));
-  }
-  else if (type.find("ZDA") != std::string::npos)
-  {
-    printZDA(GPS::parseZDA(sample));
-  }
-  else
-  {
-    fmt::println("This is not working :(");
-  }
 }
 
 void Printer::printTitle(std::string_view label)
@@ -148,6 +45,95 @@ void Printer::printSatellite(Satellite satellite)
       satellite.azimuth,
       fmt::format(fg(fmt::color::yellow_green), "SNR: "),
       satellite.snr);
+}
+
+std::string Printer::formatUtcTime(std::tuple<std::string, std::string, std::string> utcTime)
+{
+  auto [hours, minutes, seconds] = utcTime;
+  return fmt::format("{}:{}:{}", hours, minutes, seconds);
+}
+
+std::string Printer::formatUtcDate(std::tuple<std::string, std::string, std::string> utcDate)
+{
+  auto [day, month, year] = utcDate;
+  return fmt::format("{}/{}/{}", day, month, year);
+}
+
+void Printer::print(std::string_view sample)
+{
+  auto type = sample.substr(0, 6);
+
+  if (type.find("GGA") != std::string::npos)
+  {
+    auto data{std::any_cast<GGA>(GPS::parse(sample))};
+
+    printTitle(fmt::format("{} Sample Data", data.type.substr(1)));
+  }
+  else if (type.find("GLL") != std::string::npos)
+  {
+    auto data{std::any_cast<GLL>(GPS::parse(sample))};
+
+    printTitle(fmt::format("{} Sample Data", data.type.substr(1)));
+    printInfo("Time", formatUtcTime(GPS::parseUtcTime(data.utcTime)));
+    printNumber("Latitude", GPS::parseLatitude(data.latitude));
+    printNumber("Longitude", GPS::parseLongitude(data.longitude, data.longitudeDirection));
+    printInfo("Status", data.status);
+  }
+  else if (type.find("GSA") != std::string::npos)
+  {
+    auto data{std::any_cast<GSA>(GPS::parse(sample))};
+
+    printTitle(fmt::format("{} Sample Data", data.type.substr(1)));
+    printInfo("Mode", data.mode);
+    printInfo("Fix Type", data.fixType);
+    printInfo("Satellite", GPS::stringifyVector(data.satellites));
+    printInfo("PDOP", data.PDOP);
+    printInfo("HDOP", data.HDOP);
+    printInfo("VDOP", data.VDOP);
+  }
+  else if (type.find("GSV") != std::string::npos)
+  {
+    auto data{std::any_cast<GSV>(GPS::parse(sample))};
+
+    printTitle(fmt::format("{} Sample Data", data.type.substr(1)));
+    printInfo("Number of Messages", data.numberOfMessages);
+    printInfo("Sequence Number", data.sequenceNumber);
+    printInfo("Satellites in View", data.satellitesInView);
+
+    printSubtitle("Satellites");
+
+    for (int i = 0; i < std::stoi(data.numberOfMessages); i++)
+    {
+      printSatellite(data.satellites[i]);
+    }
+  }
+  else if (type.find("RMC") != std::string::npos)
+  {
+    auto data{std::any_cast<RMC>(GPS::parse(sample))};
+
+    printTitle(fmt::format("{} Sample Data", data.type.substr(1)));
+    printInfo("Time", formatUtcTime(GPS::parseUtcTime(data.utcTime)));
+    printInfo("Date", formatUtcDate(GPS::parseUtcDate(data.utcDate)));
+    printNumber("Latitude", GPS::parseLatitude(data.latitude));
+    printNumber("Longitude", GPS::parseLongitude(data.longitude, data.longitudeDirection));
+    printNumber("Speed", GPS::parseSpeed(data.speed, GPS::ms), "m/s");
+  }
+  else if (type.find("VTG") != std::string::npos)
+  {
+    auto data{std::any_cast<VTG>(GPS::parse(sample))};
+
+    printTitle(fmt::format("{} Sample Data", data.type.substr(1)));
+  }
+  else if (type.find("ZDA") != std::string::npos)
+  {
+    auto data{std::any_cast<ZDA>(GPS::parse(sample))};
+
+    printTitle(fmt::format("{} Sample Data", data.type.substr(1)));
+  }
+  else
+  {
+    throw std::runtime_error("Sample type not supported");
+  }
 }
 
 void Printer::clearScreen()

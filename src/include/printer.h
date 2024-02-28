@@ -2,20 +2,13 @@
 
 #include <fmt/format.h>
 #include <fmt/color.h>
+#include <any>
 
 #include "gps.h"
 
 class Printer
 {
 private:
-  static void printGGA(GGA);
-  static void printGLL(GLL);
-  static void printGSA(GSA);
-  static void printGSV(GSV);
-  static void printRMC(RMC);
-  static void printVTG(VTG);
-  static void printZDA(ZDA);
-
   static void printTitle(std::string_view);
   static void printSubtitle(std::string_view);
   static void printInfo(std::string_view, auto);
@@ -25,6 +18,9 @@ private:
 public:
   Printer();
   ~Printer();
+
+  static std::string formatUtcTime(std::tuple<std::string, std::string, std::string>);
+  static std::string formatUtcDate(std::tuple<std::string, std::string, std::string>);
 
   static void print(std::string_view);
   static void clearScreen();
