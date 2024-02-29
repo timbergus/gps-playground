@@ -122,6 +122,11 @@ int main()
     EndDrawing();
   }
 
+  if (WindowShouldClose())
+  {
+    t.detach();
+  }
+
   t.join();
 
   CloseWindow();
