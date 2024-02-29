@@ -122,13 +122,6 @@ int main()
     EndDrawing();
   }
 
-  if (WindowShouldClose())
-  {
-    t.detach();
-  }
-
-  t.join();
-
   CloseWindow();
 
   return EXIT_SUCCESS;
