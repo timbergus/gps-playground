@@ -20,7 +20,6 @@ void getSample(std::string_view fileName)
 
   while (std::getline(samples, sample))
   {
-
     if (GPS::isValidSample(sample) && sample.substr(0, 5).find("RMC") != std::string::npos)
     {
       measure = GPS::parse(sample);
