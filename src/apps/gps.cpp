@@ -1,12 +1,5 @@
 #include "gps.h"
 
-std::vector<std::string> GPS::tokenize(std::string_view sample)
-{
-  std::vector<std::string> rawData = split(sample, '*');
-
-  return split(rawData.at(0), ',');
-}
-
 GPS::GPS()
 {
 }
@@ -17,7 +10,7 @@ GPS::~GPS()
 
 std::any GPS::parse(std::string_view sample)
 {
-  auto tokens = tokenize(sample);
+  auto tokens = split(split(sample, '*').at(0), ',');
 
   auto type = tokens.at(0);
 
@@ -233,21 +226,13 @@ double GPS::parseSpeed(std::string_view speed, Units units)
 bool GPS::isValidSample(std::string_view sample)
 {
   std::string segment;
-  std::vector<std::string> tokens;
-  std::stringstream sampleStream{sample.data()};
-
-  while (std::getline(sampleStream, segment, '*'))
-  {
-    tokens.push_back(segment);
-  }
-
-  std::string data = tokens.at(0).substr(1);
+  std::vector<std::string> tokens{split(sample, '*')};
 
   int check = 0;
 
-  for (size_t i = 0; i < data.size(); i++)
+  for (size_t i = 0; i < tokens.at(0).size(); i++)
   {
-    check = char(check ^ data.at(i));
+    check = char(check ^ tokens.at(0).at(i));
   }
 
   std::stringstream hexCheck;

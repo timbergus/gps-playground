@@ -61,7 +61,7 @@ std::string Printer::formatUtcDate(std::tuple<std::string, std::string, std::str
 
 void Printer::print(std::string_view sample)
 {
-  auto type = sample.substr(0, 6);
+  auto type = sample.substr(0, 5);
 
   if (type.find("GGA") != std::string::npos)
   {

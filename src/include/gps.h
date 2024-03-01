@@ -113,9 +113,6 @@ public:
     kmh
   };
 
-private:
-  static std::vector<std::string> tokenize(std::string_view);
-
 public:
   GPS();
   ~GPS();
